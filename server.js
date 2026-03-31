@@ -75,12 +75,19 @@ createServer(async (req, res) => {
       return sendJson(res, 200, await testProvider(body.provider));
     }
 
-    if (req.method === "GET" && req.url?.startsWith("/api/flights/search")) {
-      const url = new URL(req.url, `http://${req.headers.host}`);
-      return sendJson(res, 200, await handleFlightSearch(url.searchParams));
-    }
+    iif (req.method === "GET" && req.url?.startsWith("/api/flights/search")) {
+     const url = new URL(req.url, `http://${req.headers.host}`);
+     return sendJson(res, 200, await handleFlightSearch(url.searchParams));
+   }
 
-    return serveStatic(req, res);
+   // 支援 /assets/ 路由（相容性處理）
+   if (req.method === "GET" && req.url?.startsWith("/assets/")) {
+     const assetPath = req.url.replace(/^\/assets\//, "/");
+     const newReq = { ...req, url: assetPath };
+     return serveStatic(newReq, res);
+   }
+
+   return serveStatic(req, res);
   } catch (error) {
     return sendJson(res, 500, {
       ok: false,
