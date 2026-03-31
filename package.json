@@ -1,14 +1,9 @@
 {
   "name": "busan-trip-collab-planner",
   "version": "1.0.0",
-  "description": "釜山自由行協作規劃網站",
   "private": true,
   "type": "module",
-  "engines": {
-    "node": "18.x || 20.x"
-  },
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node server.js"
   }
 }

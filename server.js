@@ -13,7 +13,7 @@ loadEnv(envFilePath);
 const execFileAsync = promisify(execFile);
 
 const PORT = Number(process.env.PORT || 3000);
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "945269";
+const ADMIN_PASSWORD = "5269";
 const ADMIN_COOKIE = "busan_admin_auth=1; Path=/; HttpOnly; SameSite=Lax";
 const ADMIN_COOKIE_CLEAR = "busan_admin_auth=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0";
 
@@ -75,19 +75,12 @@ createServer(async (req, res) => {
       return sendJson(res, 200, await testProvider(body.provider));
     }
 
-    iif (req.method === "GET" && req.url?.startsWith("/api/flights/search")) {
-     const url = new URL(req.url, `http://${req.headers.host}`);
-     return sendJson(res, 200, await handleFlightSearch(url.searchParams));
-   }
+    if (req.method === "GET" && req.url?.startsWith("/api/flights/search")) {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      return sendJson(res, 200, await handleFlightSearch(url.searchParams));
+    }
 
-   // 支援 /assets/ 路由（相容性處理）
-   if (req.method === "GET" && req.url?.startsWith("/assets/")) {
-     const assetPath = req.url.replace(/^\/assets\//, "/");
-     const newReq = { ...req, url: assetPath };
-     return serveStatic(newReq, res);
-   }
-
-   return serveStatic(req, res);
+    return serveStatic(req, res);
   } catch (error) {
     return sendJson(res, 500, {
       ok: false,
