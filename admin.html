@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>釜山行程後台編輯器</title>
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="hero admin-hero">
+        <div>
+          <p class="eyebrow">Admin Planner</p>
+          <h1>後台管理中心</h1>
+          <p class="hero-copy">你可以在這裡管理行程、前台住宿/票券/地圖內容、朋友回饋與 API 設定。</p>
+        </div>
+        <div class="hero-card">
+          <h2>管理項目</h2>
+          <ul>
+            <li>行程時間區塊新增 / 移動 / 刪除</li>
+            <li>前台住宿、票券、通訊、地圖內容編輯</li>
+            <li>朋友回饋審核</li>
+            <li>AI 與 API 設定</li>
+          </ul>
+          <button id="admin-logout" type="button" class="ghost">登出後台</button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="sidebar panel">
+          <p class="section-kicker">後台菜單</p>
+          <div class="menu-list">
+            <button class="menu-button active" type="button" data-admin-target="general">基本設定</button>
+            <button class="menu-button" type="button" data-admin-target="itinerary">行程編輯</button>
+            <button class="menu-button" type="button" data-admin-target="guides">前台內容</button>
+            <button class="menu-button" type="button" data-admin-target="feedback">朋友回饋</button>
+          </div>
+          <div class="side-note">
+            <a class="admin-link" href="./index.html">回前台首頁</a>
+          </div>
+        </aside>
+
+        <section class="content-stack">
+          <section class="panel admin-panel active" data-admin-panel="general">
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">總設定</p>
+                <h2>旅行基本資料與航班</h2>
+              </div>
+            </div>
+            <form id="planner-meta-form" class="trip-form">
+              <div class="grid two">
+                <label>旅行名稱<input name="title" /></label>
+                <label>城市<input name="city" /></label>
+              </div>
+              <div class="grid two">
+                <label>出發日期<input type="date" name="startDate" /></label>
+                <label>回程日期<input type="date" name="endDate" /></label>
+              </div>
+              <div class="grid two">
+                <label>去程航班<input name="outboundFlight" /></label>
+                <label>回程航班<input name="inboundFlight" /></label>
+              </div>
+              <div class="grid two">
+                <label>第二天朋友加入航班<input name="friendJoinFlight" /></label>
+                <label>AI 模型<input name="aiModel" /></label>
+              </div>
+              <label>整體備註<textarea name="generalNotes" rows="3"></textarea></label>
+              <div class="grid two">
+                <label>Gemini API 端點<input name="geminiBaseUrl" /></label>
+                <label>Google Maps API 端點<input name="naverMapBaseUrl" /></label>
+              </div>
+              <label>航班 API 端點<input name="flightBaseUrl" /></label>
+              <div class="actions">
+                <button type="submit" class="primary">儲存總設定</button>
+              </div>
+            </form>
+
+            <div class="section-heading space-top">
+              <div>
+                <p class="section-kicker">API 設定</p>
+                <h2>金鑰儲存與連線測試</h2>
+              </div>
+            </div>
+            <form id="api-settings-form" class="trip-form">
+              <div class="grid two">
+                <label>Gemini 模型<input name="openaiModel" placeholder="例如：gemini-2.5-flash" /></label>
+                <label>Gemini API Key<input type="password" name="openaiApiKey" placeholder="貼上 Gemini API key" /></label>
+              </div>
+              <div class="grid two">
+                <label>Google Cloud Project ID<input name="gcpProjectId" placeholder="可留空" /></label>
+                <label>Vertex AI 地區<input name="gcpLocation" placeholder="例如：us-central1" /></label>
+              </div>
+              <div class="grid two">
+                <label>Google Maps API Key<input type="password" name="naverClientId" /></label>
+                <label>Google Maps 備用 Secret / 備註<input type="password" name="naverClientSecret" /></label>
+              </div>
+              <div class="grid two">
+                <label>Amadeus Client ID<input type="password" name="amadeusClientId" /></label>
+                <label>Amadeus Client Secret<input type="password" name="amadeusClientSecret" /></label>
+              </div>
+              <label>Amadeus Base URL<input name="amadeusBaseUrl" placeholder="https://test.api.amadeus.com" /></label>
+              <div class="actions">
+                <button type="submit" class="primary">儲存 API 設定</button>
+                <button type="button" class="secondary" data-test-provider="gemini">測試 Gemini</button>
+                <button type="button" class="secondary" data-test-provider="naver">測試 Google Maps 設定</button>
+                <button type="button" class="secondary" data-test-provider="amadeus">測試 Amadeus</button>
+              </div>
+            </form>
+            <div id="api-settings-status" class="space-top"></div>
+          </section>
+
+          <section class="panel admin-panel" data-admin-panel="itinerary">
+            <div class="section-heading row-between">
+              <div>
+                <p class="section-kicker">AI 助理</p>
+                <h2>路線檢查與提醒</h2>
+              </div>
+              <button id="run-ai-check" type="button" class="secondary">重新檢查全行程</button>
+            </div>
+            <div id="ai-check-root" class="stack"></div>
+
+            <div class="section-heading row-between space-top">
+              <div>
+                <p class="section-kicker">每日編排</p>
+                <h2>時間區塊行程編輯器</h2>
+              </div>
+              <button id="add-item-button" type="button" class="primary">新增行程區塊</button>
+            </div>
+            <div id="day-tabs-root"></div>
+            <div id="planner-editor-root" class="space-top"></div>
+
+            <div class="section-heading space-top">
+              <div>
+                <p class="section-kicker">新增區塊</p>
+                <h2>快速建立景點</h2>
+              </div>
+            </div>
+            <form id="item-form" class="trip-form">
+              <div class="grid two">
+                <label>日期<select name="dayId" id="item-day-select"></select></label>
+                <label>區塊類型<select name="blockType"><option value="activity">景點</option><option value="transport">交通</option><option value="flight">航班</option></select></label>
+              </div>
+              <div class="grid two">
+                <label>景點<input name="place" placeholder="景點區塊時填，例如：海雲台" /></label>
+                <label>開始時間<input type="time" name="startTime" required /></label>
+              </div>
+              <div class="grid two">
+                <label>結束時間<input type="time" name="endTime" required /></label>
+                <label>區塊標題<input name="title" placeholder="例如：海雲台海邊散步 + 午餐" required /></label>
+              </div>
+              <label>備註<textarea name="notes" rows="3"></textarea></label>
+              <div class="grid two">
+                <label>交通方式<input name="transportMode" placeholder="交通區塊時填，例如：地鐵" /></label>
+                <label>交通時間(分鐘)<input type="number" name="durationMinutes" placeholder="例如：45" /></label>
+              </div>
+              <div class="grid two">
+                <label>起點<input name="from" placeholder="交通區塊時填" /></label>
+                <label>終點<input name="to" placeholder="交通區塊時填" /></label>
+              </div>
+              <div class="grid two">
+                <label>旅客<input name="travelerName" placeholder="航班區塊時填，例如：朋友 B" /></label>
+                <label>班號<input name="flightNumber" placeholder="航班區塊時填，例如：LJ082" /></label>
+              </div>
+              <div class="grid two">
+                <label>航線<input name="route" placeholder="例如：TPE -> PUS" /></label>
+                <label>機場 / 航廈<input name="terminal" placeholder="例如：釜山金海機場" /></label>
+              </div>
+              <div class="actions">
+                <button type="submit" class="primary">加入行程</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel admin-panel" data-admin-panel="guides">
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">前台內容管理</p>
+                <h2>住宿、票券、通訊與地圖</h2>
+              </div>
+            </div>
+            <div id="guide-editor-root" class="stack"></div>
+          </section>
+
+          <section class="panel admin-panel" data-admin-panel="feedback">
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">朋友回饋</p>
+                <h2>待審核需求</h2>
+              </div>
+            </div>
+            <div id="feedback-review-root" class="stack"></div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="./assets/data.js"></script>
+    <script src="./assets/admin.js"></script>
+  </body>
+</html>

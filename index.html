@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>釜山自由行協作規劃</title>
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <div class="shell" id="top">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Busan Collaboration Planner</p>
+          <h1>釜山 4 天 3 夜協作行程</h1>
+          <p class="hero-copy">
+            後台先把每日行程、航班與時間軸規劃好，前台再提供朋友查看總行程、路線預覽與提出修改需求。
+          </p>
+        </div>
+        <div class="hero-card">
+          <h2>旅行資訊</h2>
+          <ul id="hero-trip-meta" class="info-list"></ul>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="sidebar panel">
+          <p class="section-kicker">前台菜單</p>
+          <div class="menu-list">
+            <button class="menu-button active" type="button" data-menu-target="overview">總行程預覽</button>
+            <button class="menu-button" type="button" data-menu-target="hotels">釜山住宿指南</button>
+            <button class="menu-button" type="button" data-menu-target="tickets">票券整理</button>
+            <button class="menu-button" type="button" data-menu-target="connectivity">通訊 / 交通</button>
+            <button class="menu-button" type="button" data-menu-target="map">釜山地圖</button>
+            <button class="menu-button" type="button" data-menu-target="request">新增行程 / 修改需求</button>
+          </div>
+          <div class="side-note">
+            <p class="small muted">
+              朋友先看你排好的大方向，再用需求單回報想改的地方，最後由你在後台審核。
+            </p>
+            <a class="admin-link" href="./login.html" id="admin-entry-link">前往後台編輯</a>
+          </div>
+        </aside>
+
+        <section class="content-stack">
+          <section class="panel menu-panel active" data-menu-panel="overview">
+            <div class="section-heading row-between">
+              <div>
+                <p class="section-kicker">總行程預覽</p>
+                <h2 id="overview-title">每日時間軸與路線</h2>
+              </div>
+              <div class="chip-row" id="overview-flights"></div>
+            </div>
+            <div id="overview-root"></div>
+          </section>
+
+          <section class="panel menu-panel" data-menu-panel="hotels">
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">住宿指南</p>
+                <h2>釜山住宿分區整理</h2>
+              </div>
+            </div>
+            <div id="hotel-guide-root"></div>
+          </section>
+
+          <section class="panel menu-panel" data-menu-panel="tickets">
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">票券整理</p>
+                <h2>熱門票券與釜山 Pass 對照</h2>
+              </div>
+            </div>
+            <div id="ticket-guide-root"></div>
+          </section>
+
+          <section class="panel menu-panel" data-menu-panel="connectivity">
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">通訊 / 交通</p>
+                <h2>上網方案與交通工具整理</h2>
+              </div>
+            </div>
+            <div id="connectivity-guide-root"></div>
+          </section>
+
+          <section class="panel menu-panel" data-menu-panel="map">
+            <div class="section-heading">
+              <div>
+                <p class="section-kicker">釜山地圖</p>
+                <h2>景點、住宿與票券地圖</h2>
+              </div>
+            </div>
+            <div id="map-guide-root"></div>
+          </section>
+
+          <section class="panel menu-panel" data-menu-panel="request">
+            <div class="section-heading">
+              <p class="section-kicker">朋友回饋</p>
+              <h2>新增行程需求 / 提出修改</h2>
+            </div>
+            <form id="feedback-form" class="trip-form">
+              <div class="grid two">
+                <label>
+                  提交人
+                  <input name="requesterName" placeholder="例如：Roger" required />
+                </label>
+                <label>
+                  希望調整的日期
+                  <select name="targetDay">
+                    <option value="">整體行程</option>
+                    <option value="day-1">Day 1</option>
+                    <option value="day-2">Day 2</option>
+                    <option value="day-3">Day 3</option>
+                    <option value="day-4">Day 4</option>
+                  </select>
+                </label>
+              </div>
+
+              <label>
+                想新增或修改的景點 / 活動
+                <textarea
+                  name="requestedPlaces"
+                  rows="4"
+                  placeholder="每行一個，例如：白淺灘文化村、海景咖啡廳、汗蒸幕"
+                  required
+                ></textarea>
+              </label>
+
+              <label>
+                希望怎麼調整
+                <textarea
+                  name="requestMessage"
+                  rows="4"
+                  placeholder="例如：Day 2 下午想改去白淺灘文化村，晚上還是想保留廣安里夜景"
+                  required
+                ></textarea>
+              </label>
+
+              <label>
+                個人限制 / 注意事項
+                <textarea
+                  name="constraints"
+                  rows="3"
+                  placeholder="例如：不想太早起、有人怕走太多樓梯、想多安排購物"
+                ></textarea>
+              </label>
+
+              <div class="actions">
+                <button type="submit" class="primary">送出修改需求</button>
+              </div>
+            </form>
+            <div id="feedback-list" class="stack space-top"></div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="./assets/data.js"></script>
+    <script src="./assets/app.js"></script>
+  </body>
+</html>

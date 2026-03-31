@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>後台登入</title>
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <div class="login-shell">
+        <section class="panel login-card">
+          <p class="section-kicker">Admin Login</p>
+          <h1>後台登入</h1>
+          <p class="hero-copy">輸入管理密碼後，才能進入後台編輯前端內容與行程。</p>
+          <form id="login-form" class="trip-form">
+            <label>
+              後台密碼
+              <input type="password" name="password" required />
+            </label>
+            <div class="actions">
+              <button type="submit" class="primary">登入</button>
+              <a class="ghost area-top-link" href="./index.html">回前台</a>
+            </div>
+          </form>
+          <div id="login-status" class="space-top"></div>
+        </section>
+      </div>
+    </div>
+
+    <script src="./assets/login.js"></script>
+  </body>
+</html>
