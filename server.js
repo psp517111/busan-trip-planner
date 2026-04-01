@@ -9,6 +9,7 @@ import { promisify } from "node:util";
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const rootDir = __dirname;
 const envFilePath = join(rootDir, "backend", ".env");
+const feedbackFile = join(rootDir, "feedback.json");
 loadEnv(envFilePath);
 const execFileAsync = promisify(execFile);
 
@@ -24,6 +25,27 @@ const mimeTypes = {
   ".json": "application/json; charset=utf-8",
   ".md": "text/markdown; charset=utf-8"
 };
+
+// ✅ 檔案儲存函數
+function loadFeedback() {
+  try {
+    if (existsSync(feedbackFile)) {
+      const data = readFileSync(feedbackFile, "utf8");
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.error("Error loading feedback:", error);
+  }
+  return [];
+}
+
+function saveFeedback(submissions) {
+  try {
+    writeFileSync(feedbackFile, JSON.stringify(submissions, null, 2), "utf8");
+  } catch (error) {
+    console.error("Error saving feedback:", error);
+  }
+}
 
 createServer(async (req, res) => {
   try {
@@ -80,24 +102,30 @@ createServer(async (req, res) => {
       return sendJson(res, 200, await handleFlightSearch(url.searchParams));
     }
 
-    // ✅ Feedback API - 簡單版本（不需要 getStore/saveStore）
+    // ✅ Feedback API - 支援檔案儲存
     if (req.method === "POST" && req.url === "/api/feedback") {
       const body = await readJson(req);
+      const submissions = loadFeedback();
+      const newFeedback = {
+        id: `feedback-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        status: "pending",
+        ...body
+      };
+      submissions.push(newFeedback);
+      saveFeedback(submissions);
       return sendJson(res, 200, { 
         ok: true, 
         message: "感謝你的建議，已收到你的申請。",
-        feedback: {
-          id: `feedback-${Date.now()}`,
-          timestamp: new Date().toISOString(),
-          ...body
-        }
+        feedback: newFeedback
       });
     }
 
     if (req.method === "GET" && req.url === "/api/feedback") {
+      const submissions = loadFeedback();
       return sendJson(res, 200, { 
         ok: true, 
-        feedbackSubmissions: []
+        feedbackSubmissions: submissions
       });
     }
 
