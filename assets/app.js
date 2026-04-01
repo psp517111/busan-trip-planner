@@ -367,14 +367,33 @@
     `;
   }
 
-  feedbackForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const formData = new FormData(feedbackForm);
-    createFeedback(Object.fromEntries(formData.entries()));
-    feedbackForm.reset();
-    renderFeedbackList();
-    alert("修改需求已送到後台審核。");
-  });
+  feedbackForm.addEventListener("submit", async (event) => {
+     event.preventDefault();
+     const formData = new FormData(feedbackForm);
+     const payload = Object.fromEntries(formData.entries());
+     
+     try {
+       const response = await fetch("/api/feedback", {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify(payload)
+       });
+       
+       if (response.ok) {
+         createFeedback(payload);
+         feedbackForm.reset();
+         renderFeedbackList();
+         alert("修改需求已送到後台審核。");
+       } else {
+         alert("提交失敗，請稍後重試。");
+       }
+     } catch (error) {
+       console.error("提交錯誤：", error);
+       createFeedback(payload);
+       feedbackForm.reset();
+       alert("已本地暫存，稍後會同步到後台。");
+     }
+   });
 
   renderMenu();
   renderHero();
