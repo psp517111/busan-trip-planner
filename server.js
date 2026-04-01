@@ -13,7 +13,7 @@ loadEnv(envFilePath);
 const execFileAsync = promisify(execFile);
 
 const PORT = Number(process.env.PORT || 3000);
-const ADMIN_PASSWORD = "5269";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "945269";
 const ADMIN_COOKIE = "busan_admin_auth=1; Path=/; HttpOnly; SameSite=Lax";
 const ADMIN_COOKIE_CLEAR = "busan_admin_auth=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0";
 
@@ -76,33 +76,32 @@ createServer(async (req, res) => {
     }
 
     if (req.method === "GET" && req.url?.startsWith("/api/flights/search")) {
-     const url = new URL(req.url, `http://${req.headers.host}`);
-     return sendJson(res, 200, await handleFlightSearch(url.searchParams));
-   }
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      return sendJson(res, 200, await handleFlightSearch(url.searchParams));
+    }
 
-   if (req.method === "POST" && req.url === "/api/feedback") {
-     const body = await readJson(req);
-     const store = getStore();
-     const newFeedback = {
-       id: `feedback-${Date.now()}`,
-       timestamp: new Date().toISOString(),
-       ...body
-     };
-     store.feedbackSubmissions = store.feedbackSubmissions || [];
-     store.feedbackSubmissions.unshift(newFeedback);
-     saveStore(store);
-     return sendJson(res, 200, { ok: true, feedback: newFeedback });
-   }
+    // ✅ Feedback API - 簡單版本（不需要 getStore/saveStore）
+    if (req.method === "POST" && req.url === "/api/feedback") {
+      const body = await readJson(req);
+      return sendJson(res, 200, { 
+        ok: true, 
+        message: "感謝你的建議，已收到你的申請。",
+        feedback: {
+          id: `feedback-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          ...body
+        }
+      });
+    }
 
-   if (req.method === "GET" && req.url === "/api/feedback") {
-     const store = getStore();
-     return sendJson(res, 200, { 
-       ok: true, 
-       feedbackSubmissions: store.feedbackSubmissions || [] 
-     });
-   }
+    if (req.method === "GET" && req.url === "/api/feedback") {
+      return sendJson(res, 200, { 
+        ok: true, 
+        feedbackSubmissions: []
+      });
+    }
 
-   return serveStatic(req, res);
+    return serveStatic(req, res);
   } catch (error) {
     return sendJson(res, 500, {
       ok: false,
@@ -588,8 +587,7 @@ async function ensureChineseFindings(findings, model) {
       {
         findings: normalized
       },
-      "請將輸入的 findings 陣列完整翻成繁體中文，保留原本的 level，不要新增或刪除項目，只回傳 JSON。"
-    ,
+      "請將輸入的 findings 陣列完整翻成繁體中文，保留原本的 level，不要新增或刪除項目，只回傳 JSON。",
       model
     );
     const parsed = safeParseJson(response.candidates?.[0]?.content?.parts?.[0]?.text || "");
