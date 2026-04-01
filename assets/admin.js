@@ -772,5 +772,24 @@
   renderAiChecks();
   renderGuideEditor();
   renderFeedbackReview();
-  loadApiSettings();
+  loadApiSettings();loadApiSettings();
+  
+  // ↓↓↓ 在這裡加入新代碼 ↓↓↓
+  async function loadFeedbackFromServer() {
+    try {
+      const response = await fetch("/api/feedback");
+      if (response.ok) {
+        const data = await response.json();
+        const store = getStore();
+        store.feedbackSubmissions = data.feedbackSubmissions || [];
+        renderFeedbackReview();
+      }
+    } catch (error) {
+      console.error("載入反饋失敗：", error);
+    }
+  }
+
+  loadFeedbackFromServer();
+  // ↑↑↑ 加到這裡 ↑↑↑
+})();
 })();
