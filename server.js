@@ -76,11 +76,33 @@ createServer(async (req, res) => {
     }
 
     if (req.method === "GET" && req.url?.startsWith("/api/flights/search")) {
-      const url = new URL(req.url, `http://${req.headers.host}`);
-      return sendJson(res, 200, await handleFlightSearch(url.searchParams));
-    }
+     const url = new URL(req.url, `http://${req.headers.host}`);
+     return sendJson(res, 200, await handleFlightSearch(url.searchParams));
+   }
 
-    return serveStatic(req, res);
+   if (req.method === "POST" && req.url === "/api/feedback") {
+     const body = await readJson(req);
+     const store = getStore();
+     const newFeedback = {
+       id: `feedback-${Date.now()}`,
+       timestamp: new Date().toISOString(),
+       ...body
+     };
+     store.feedbackSubmissions = store.feedbackSubmissions || [];
+     store.feedbackSubmissions.unshift(newFeedback);
+     saveStore(store);
+     return sendJson(res, 200, { ok: true, feedback: newFeedback });
+   }
+
+   if (req.method === "GET" && req.url === "/api/feedback") {
+     const store = getStore();
+     return sendJson(res, 200, { 
+       ok: true, 
+       feedbackSubmissions: store.feedbackSubmissions || [] 
+     });
+   }
+
+   return serveStatic(req, res);
   } catch (error) {
     return sendJson(res, 500, {
       ok: false,
